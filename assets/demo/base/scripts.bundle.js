@@ -3964,23 +3964,35 @@ $(document).ready(function() {
           rows = $(datatable.tableBody).find('.' + pfx + 'datatable__lock:nth-child(' + (hIndex + 1) + ')').find('.' + pfx + 'datatable__row');
         }
 
-        var container = $(rows).parent();
-        $(rows).sort(function(a, b) {
-          var tda = $(a).find('td:nth-child(' + column + ')').text();
-          var tdb = $(b).find('td:nth-child(' + column + ')').text();
+        // Get the parent container of the rows
+        var container = document.querySelector(rows).parentElement;
 
-          if (int) {
-            // useful for integer type sorting
-            tda = parseInt(tda);
-            tdb = parseInt(tdb);
-          }
+        // Convert the rows from a jQuery object to a standard array of DOM elements
+        var rowArray = Array.from(document.querySelectorAll(rows));
 
-          if (sort === 'asc') {
+        // Sort the rows based on the specified column and sorting order
+        rowArray.sort(function(a, b) {
+        var tda = a.querySelector('td:nth-child(' + column + ')').textContent;
+        var tdb = b.querySelector('td:nth-child(' + column + ')').textContent;
+
+        if (int) {
+            // Useful for integer type sorting
+            tda = parseInt(tda, 10);
+            tdb = parseInt(tdb, 10);
+        }
+
+        if (sort === 'asc') {
             return tda > tdb ? 1 : tda < tdb ? -1 : 0;
-          } else {
+        } else {
             return tda < tdb ? 1 : tda > tdb ? -1 : 0;
-          }
-        }).appendTo(container);
+        }
+        });
+
+        // Append the sorted rows back to the container using appendChild
+        rowArray.forEach(function(row) {
+        container.appendChild(row);
+        });
+
       },
 
       /**
