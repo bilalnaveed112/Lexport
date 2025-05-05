@@ -3049,31 +3049,33 @@ $(document).ready(function() {
             pg.pagerLayout['pagination'] = pagerNumber;
 
             // pager first/previous button
-            $('<li/>')
-                .append(
-                    $('<a/>')
-                        .attr('title', $('<div>').text(title.first).html())  // escape title
-                        .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--first')
-                        .append($('<i/>').addClass($('<div>').text(icons.first).html()))  // escape icon class
-                        .on('click', pg.gotoMorePage)
-                        .attr('data-page', 1)
+            $('<li/>').append(
+                $('<a/>', {
+                    title: typeof title.first === 'string' ? title.first : '',
+                    'data-page': 1,
+                    class: pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--first',
+                    click: pg.gotoMorePage
+                }).append(
+                    $('<i/>').addClass(
+                        ['fa-chevron-left', 'fa-angle-left', 'custom-icon'].includes(icons.first)
+                            ? icons.first
+                            : 'default-icon'
+                    )
                 )
-                .appendTo(pagerNumber);
-                $('<li/>')
-                .append(
-                    $('<a/>')
-                        .attr('title', String(title.prev)) // directly set as a string
-                        .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--prev')
-                        .append(
-                            $('<i/>').addClass(
-                                ['fa-chevron-left', 'fa-angle-left', 'custom-icon'].includes(icons.prev)
-                                    ? icons.prev
-                                    : 'default-icon'
-                            )
-                        )
-                        .on('click', pg.gotoMorePage)
+            ).appendTo(pagerNumber);
+            $('<li/>').append(
+                $('<a/>', {
+                    title: typeof title.prev === 'string' ? title.prev : '',
+                    class: pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--prev',
+                    click: pg.gotoMorePage
+                }).append(
+                    $('<i/>').addClass(
+                        ['fa-chevron-left', 'fa-angle-left', 'custom-icon'].includes(icons.prev)
+                            ? icons.prev
+                            : 'default-icon'
+                    )
                 )
-                .appendTo(pagerNumber);            
+            ).appendTo(pagerNumber);            
             // more previous pages
             $('<li/>')
                 .append(
