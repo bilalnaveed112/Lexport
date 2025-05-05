@@ -6,3 +6,5 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ index.php/$1 [L]
 </IfModule>
+
+SetEnv RECAPTCHA_SECRET_KEY 6Lfvg2EUAAAAAJU3gsQsoww5x0uaHXuRDTFPYJhv
