@@ -104,7 +104,7 @@ include('header.php');
 			<div class="form-group m-form__group row">
 				<div class="form-group col-md-6">
 				<label><?php echo $this->lang->line('From');?></label>
-				<?= form_input(['id'=>'from','name'=>'from','class'=>'form-control','value'=>$from,'autocomplete'=>'off',"required"=>"required"]);?>
+				<?= form_input(['id'=>'from','name'=>'from','class'=>'form-control','value'=>html_escape($from),'autocomplete'=>'off',"required"=>"required"]);?>
 				<div class="form-error"><?php echo htmlspecialchars(form_error('from'), ENT_QUOTES, 'UTF-8'); ?></div>
 			</div>	
 
@@ -115,7 +115,7 @@ include('header.php');
 				<option  value=""><?php echo $this->lang->line('All');?></option>
 				<?php
 				foreach (branch() as $b) { ?>
-				<option value="<?php echo $b['id']?>" <?php if($branch==$b['id']) echo "selected=selected";?>><?php echo $b['name']?></option>
+				<option value="<?php echo html_escape($b['id'])?>" <?php if($branch==$b['id']) echo "selected=selected";?>><?php echo html_escape($b['name'])?></option>
 				<?php } ?>
 				</select>
 			</div> 		

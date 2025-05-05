@@ -25,7 +25,6 @@ date_default_timezone_set('Asia/Riyadh');
 |
 */
 $config['base_url'] = 'http://lexport.demosbywpsqr.com/';
-$config['recaptcha_secret'] = '6Lfvg2EUAAAAAJU3gsQsoww5x0uaHXuRDTFPYJhv';
 define("FROM_EMAIL", "do.not.reply@lexport.com");
 define("SENDER_NAME", "Lexport");
 /*
