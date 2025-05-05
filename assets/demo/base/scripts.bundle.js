@@ -4469,7 +4469,7 @@ $(document).ready(function() {
             initialDatatable = null;
             
             return $(initialDatatable); // Return as jQuery object for consistency
-        }
+        },
   
 
       /**
