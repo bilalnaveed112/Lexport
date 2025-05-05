@@ -3062,11 +3062,15 @@ $(document).ready(function() {
                 $('<li/>')
                 .append(
                     $('<a/>')
-                        .attr('title', $('<div>').text(title.prev).html())
+                        .attr('title', String(title.prev)) // directly set as a string
                         .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--prev')
-                        .append($('<i/>').addClass(
-                            ['fa-chevron-left', 'fa-angle-left', 'custom-icon'].includes(icons.prev) ? icons.prev : 'default-icon'
-                        ))
+                        .append(
+                            $('<i/>').addClass(
+                                ['fa-chevron-left', 'fa-angle-left', 'custom-icon'].includes(icons.prev)
+                                    ? icons.prev
+                                    : 'default-icon'
+                            )
+                        )
                         .on('click', pg.gotoMorePage)
                 )
                 .appendTo(pagerNumber);            
