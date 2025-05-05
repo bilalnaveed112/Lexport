@@ -3040,139 +3040,151 @@ $(document).ready(function() {
             Plugin.dataRender();
           },
           populate: function() {
+            // Basic HTML escape utility
+            function sanitize(str) {
+              var div = document.createElement('div');
+              div.appendChild(document.createTextNode(str));
+              return div.innerHTML;
+            }
+          
             var icons = Plugin.getOption('layout.icons.pagination');
             var title = Plugin.getOption('translate.toolbar.pagination.items.default');
+          
+            // Sanitize all remote content before use
+            const safeTitle = {
+              first: sanitize(title.first || ''),
+              prev: sanitize(title.prev || ''),
+              more: sanitize(title.more || ''),
+              input: sanitize(title.input || ''),
+              next: sanitize(title.next || ''),
+              last: sanitize(title.last || ''),
+              select: sanitize(Plugin.getOption('translate.toolbar.pagination.items.default.select') || '')
+            };
+          
             // pager root element
             pg.pager = $('<div/>').addClass(pfx + 'datatable__pager ' + pfx + 'datatable--paging-loaded clearfix');
-            // numbering links
             var pagerNumber = $('<ul/>').addClass(pfx + 'datatable__pager-nav');
             pg.pagerLayout['pagination'] = pagerNumber;
-
-            // Whitelist allowed icon classes
-            const allowedIcons = ['fa-chevron-left', 'fa-angle-left', 'fa-ellipsis-h', 'custom-icon'];
-            const sanitizeIcon = icon => allowedIcons.includes(icon) ? icon : 'default-icon';
-
-            // Sanitize titles
-            const safeTitleFirst = DOMPurify.sanitize(title.first);
-            const safeTitlePrev = DOMPurify.sanitize(title.prev);
-            const safeTitleMore = DOMPurify.sanitize(title.more);
-
-            // First page button
+          
+            // Pager buttons
             $('<li/>').append(
-                $('<a/>')
-                    .attr('title', safeTitleFirst)
-                    .addClass(`${pfx}datatable__pager-link ${pfx}datatable__pager-link--first`)
-                    .append($('<i/>').addClass(sanitizeIcon(icons.first)))
-                    .on('click', pg.gotoMorePage)
-                    .attr('data-page', 1)
+              $('<a/>')
+                .attr('title', safeTitle.first)
+                .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--first')
+                .append($('<i/>').addClass(icons.first))
+                .on('click', pg.gotoMorePage)
+                .attr('data-page', 1)
             ).appendTo(pagerNumber);
-
-            // Previous page button
+          
             $('<li/>').append(
-                $('<a/>')
-                    .attr('title', safeTitlePrev)
-                    .addClass(`${pfx}datatable__pager-link ${pfx}datatable__pager-link--prev`)
-                    .append($('<i/>').addClass(sanitizeIcon(icons.prev)))
-                    .on('click', pg.gotoMorePage)
+              $('<a/>')
+                .attr('title', safeTitle.prev)
+                .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--prev')
+                .append($('<i/>').addClass(icons.prev))
+                .on('click', pg.gotoMorePage)
             ).appendTo(pagerNumber);
-
-            // More previous pages button
+          
             $('<li/>').append(
-                $('<a/>')
-                    .attr('title', safeTitleMore)
-                    .addClass(`${pfx}datatable__pager-link ${pfx}datatable__pager-link--more-prev`)
-                    .append($('<i/>').addClass(sanitizeIcon(icons.more)))
-                    .on('click', pg.gotoMorePage)
+              $('<a/>')
+                .attr('title', safeTitle.more)
+                .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--more-prev')
+                .append($('<i/>').addClass(icons.more)) // use append instead of html to avoid injection
+                .on('click', pg.gotoMorePage)
             ).appendTo(pagerNumber);
-
-
-            $('<li/>').append($('<input/>').attr('type', 'text').addClass(pfx + 'pager-input form-control').attr('title', title.input).on('keyup', function() {
-              // on keyup update [data-page]
-              $(this).attr('data-page', Math.abs($(this).val()));
-            }).on('keypress', function(e) {
-              // on keypressed enter button
-              if (e.which === 13) pg.gotoMorePage(e);
-            })).appendTo(pagerNumber);
-
+          
+            $('<li/>').append(
+              $('<input/>')
+                .attr('type', 'text')
+                .addClass(pfx + 'pager-input form-control')
+                .attr('title', safeTitle.input)
+                .on('keyup', function () {
+                  $(this).attr('data-page', Math.abs($(this).val()));
+                })
+                .on('keypress', function (e) {
+                  if (e.which === 13) pg.gotoMorePage(e);
+                })
+            ).appendTo(pagerNumber);
+          
             var pagesNumber = Plugin.getOption('toolbar.items.pagination.pages.desktop.pagesNumber');
             var end = Math.ceil(pg.meta.page / pagesNumber) * pagesNumber;
             var start = end - pagesNumber;
-            if (end > pg.meta.pages) {
-              end = pg.meta.pages;
-            }
+            if (end > pg.meta.pages) end = pg.meta.pages;
+          
             for (var x = start; x < end; x++) {
               var pageNumber = x + 1;
-              $('<li/>').
-                  append($('<a/>').
-                      addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link-number').
-                      text(pageNumber).
-                      attr('data-page', pageNumber).
-                      attr('title', pageNumber).
-                      on('click', pg.gotoPage)).
-                  appendTo(pagerNumber);
+              $('<li/>').append(
+                $('<a/>')
+                  .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link-number')
+                  .text(pageNumber)
+                  .attr('data-page', pageNumber)
+                  .attr('title', pageNumber)
+                  .on('click', pg.gotoPage)
+              ).appendTo(pagerNumber);
             }
-
-            // more next pages
-            $('<li/>').
-                append($('<a/>').
-                    attr('title', title.more).
-                    addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--more-next').
-                    html($('<i/>').addClass(icons.more)).
-                    on('click', pg.gotoMorePage)).
-                appendTo(pagerNumber);
-
-            // pager next/last button
-            $('<li/>').
-                append($('<a/>').
-                    attr('title', title.next).
-                    addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--next').
-                    append($('<i/>').addClass(icons.next)).
-                    on('click', pg.gotoMorePage)).
-                appendTo(pagerNumber);
-            $('<li/>').
-                append($('<a/>').
-                    attr('title', title.last).
-                    addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--last').
-                    append($('<i/>').addClass(icons.last)).
-                    on('click', pg.gotoMorePage).
-                    attr('data-page', pg.meta.pages)).
-                appendTo(pagerNumber);
-
-            // page info
+          
+            $('<li/>').append(
+              $('<a/>')
+                .attr('title', safeTitle.more)
+                .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--more-next')
+                .append($('<i/>').addClass(icons.more))
+                .on('click', pg.gotoMorePage)
+            ).appendTo(pagerNumber);
+          
+            $('<li/>').append(
+              $('<a/>')
+                .attr('title', safeTitle.next)
+                .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--next')
+                .append($('<i/>').addClass(icons.next))
+                .on('click', pg.gotoMorePage)
+            ).appendTo(pagerNumber);
+          
+            $('<li/>').append(
+              $('<a/>')
+                .attr('title', safeTitle.last)
+                .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--last')
+                .append($('<i/>').addClass(icons.last))
+                .on('click', pg.gotoMorePage)
+                .attr('data-page', pg.meta.pages)
+            ).appendTo(pagerNumber);
+          
             if (Plugin.getOption('toolbar.items.info')) {
-              pg.pagerLayout['info'] = $('<div/>').addClass(pfx + 'datatable__pager-info').append($('<span/>').addClass(pfx + 'datatable__pager-detail'));
+              pg.pagerLayout['info'] = $('<div/>')
+                .addClass(pfx + 'datatable__pager-info')
+                .append($('<span/>').addClass(pfx + 'datatable__pager-detail'));
             }
-
-            $.each(Plugin.getOption('toolbar.layout'), function(i, layout) {
+          
+            $.each(Plugin.getOption('toolbar.layout'), function (i, layout) {
               $(pg.pagerLayout[layout]).appendTo(pg.pager);
             });
-
-            // page size select
-            var pageSizeSelect = $('<select/>').
-                addClass('selectpicker ' + pfx + 'datatable__pager-size').
-                attr('title', Plugin.getOption('translate.toolbar.pagination.items.default.select')).
-                attr('data-width', '70px').
-                val(pg.meta.perpage).
-                on('change', pg.updatePerpage).
-                prependTo(pg.pagerLayout['info']);
-
+          
+            // Page size select
+            var pageSizeSelect = $('<select/>')
+              .addClass('selectpicker ' + pfx + 'datatable__pager-size')
+              .attr('title', safeTitle.select)
+              .attr('data-width', '70px')
+              .val(pg.meta.perpage)
+              .on('change', pg.updatePerpage)
+              .prependTo(pg.pagerLayout['info']);
+          
             var pageSizes = Plugin.getOption('toolbar.items.pagination.pageSizeSelect');
-            // default value here, to fix override option by user
-            if (pageSizes.length == 0) pageSizes = [10, 20, 30, 50, 100];
-            $.each(pageSizes, function(i, size) {
-              var display = size;
-              if (size === -1) display = 'All';
-              $('<option/>').attr('value', size).html(display).appendTo(pageSizeSelect);
+            if (!Array.isArray(pageSizes) || pageSizes.length === 0) pageSizes = [10, 20, 30, 50, 100];
+          
+            $.each(pageSizes, function (i, size) {
+              var display = (size === -1) ? 'All' : size;
+              $('<option/>').attr('value', size).text(display).appendTo(pageSizeSelect);
             });
-
-            // init selectpicker to dropdown
-            $(datatable).ready(function() {
-              $('.selectpicker').selectpicker().siblings('.dropdown-toggle').attr('title', Plugin.getOption(
-                  'translate.toolbar.pagination.items.default.select'));
+          
+            // Initialize selectpicker safely
+            $(datatable).ready(function () {
+              $('.selectpicker')
+                .selectpicker()
+                .siblings('.dropdown-toggle')
+                .attr('title', safeTitle.select);
             });
-
+          
             pg.paste();
           },
+          
           paste: function() {
             // insert pagination based on placement position, top|bottom
             $.each($.unique(Plugin.getOption('toolbar.placement')),
