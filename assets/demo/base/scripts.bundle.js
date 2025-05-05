@@ -3049,45 +3049,31 @@ $(document).ready(function() {
             pg.pagerLayout['pagination'] = pagerNumber;
 
             // pager first/previous button
-            $('<li/>').append(
-                $('<a/>', {
-                    title: typeof title.first === 'string' ? title.first : '',
-                    'data-page': 1,
-                    class: pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--first',
-                    click: pg.gotoMorePage
-                }).append(
-                    $('<i/>').addClass(
-                        ['fa-chevron-left', 'fa-angle-left', 'custom-icon'].includes(icons.first)
-                            ? icons.first
-                            : 'default-icon'
-                    )
-                )
-            ).appendTo(pagerNumber);
-            $('<li/>').append(
-                $('<a/>', {
-                    title: typeof title.prev === 'string' ? title.prev : '',
-                    class: pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--prev',
-                    click: pg.gotoMorePage
-                }).append(
-                    $('<i/>').addClass(
-                        ['fa-chevron-left', 'fa-angle-left', 'custom-icon'].includes(icons.prev)
-                            ? icons.prev
-                            : 'default-icon'
-                    )
-                )
-            ).appendTo(pagerNumber);            
+            $('<li/>').
+                append($('<a/>').
+                    attr('title', DOMPurify.sanitize(title.first)).
+                    addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--first').
+                    append($('<i/>').addClass(icons.first)).
+                    on('click', pg.gotoMorePage).
+                    attr('data-page', 1)).
+                appendTo(pagerNumber);
+            $('<li/>').
+                append($('<a/>').
+                    attr('title', DOMPurify.sanitize(title.prev)).
+                    addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--prev').
+                    append($('<i/>').addClass(icons.prev)).
+                    on('click', pg.gotoMorePage)).
+                appendTo(pagerNumber);
+
             // more previous pages
-            $('<li/>')
-                .append(
-                    $('<a/>')
-                        .attr('title', $('<div>').text(title.more).html())
-                        .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--more-prev')
-                        .html($('<i/>').addClass(
-                            ['fa-ellipsis-h', 'fa-more', 'custom-icon'].includes(icons.more) ? icons.more : 'default-icon'
-                        ))
-                        .on('click', pg.gotoMorePage)
-                )
-                .appendTo(pagerNumber);
+            $('<li/>').
+                append($('<a/>').
+                    attr('title', title.more).
+                    addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--more-prev').
+                    html($('<i/>').addClass(icons.more)).
+                    on('click', pg.gotoMorePage)).
+                appendTo(pagerNumber);
+
             $('<li/>').append($('<input/>').attr('type', 'text').addClass(pfx + 'pager-input form-control').attr('title', title.input).on('keyup', function() {
               // on keyup update [data-page]
               $(this).attr('data-page', Math.abs($(this).val()));
@@ -3104,16 +3090,14 @@ $(document).ready(function() {
             }
             for (var x = start; x < end; x++) {
               var pageNumber = x + 1;
-              $('<li/>')
-                .append(
-                    $('<a/>')
-                        .addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link-number')
-                        .text($('<div>').text(pageNumber).text()) // ensures safe rendering
-                        .attr('data-page', $('<div>').text(pageNumber).text())
-                        .attr('title', $('<div>').text(pageNumber).text())
-                        .on('click', pg.gotoPage)
-                )
-                .appendTo(pagerNumber);
+              $('<li/>').
+                  append($('<a/>').
+                      addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link-number').
+                      text(pageNumber).
+                      attr('data-page', pageNumber).
+                      attr('title', pageNumber).
+                      on('click', pg.gotoPage)).
+                  appendTo(pagerNumber);
             }
 
             // more next pages

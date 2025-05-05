@@ -292,6 +292,7 @@ x.play();
 <script src="<?= base_url('assets/bootbox.min.js') ?>"></script>
 
 <!--begin::Global Theme Bundle -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.7/purify.min.js"></script>
 <script src="<?php echo base_url('assets/');?>/demo/base/scripts.bundle.js" type="text/javascript"></script>
 
 <!--end::Global Theme Bundle -->
