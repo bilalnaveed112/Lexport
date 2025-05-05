@@ -3050,7 +3050,7 @@ $(document).ready(function() {
 
             // pager first/previous button
             $('<li/>').
-                append($('<a/>').
+                html($('<a/>').
                     attr('title', DOMPurify.sanitize(title.first)).
                     addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--first').
                     append($('<i/>').addClass(icons.first)).
@@ -3058,7 +3058,7 @@ $(document).ready(function() {
                     attr('data-page', 1)).
                 appendTo(pagerNumber);
             $('<li/>').
-                append($('<a/>').
+                html($('<a/>').
                     attr('title', DOMPurify.sanitize(title.prev)).
                     addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--prev').
                     append($('<i/>').addClass(icons.prev)).
