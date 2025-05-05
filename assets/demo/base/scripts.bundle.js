@@ -3048,31 +3048,43 @@ $(document).ready(function() {
             var pagerNumber = $('<ul/>').addClass(pfx + 'datatable__pager-nav');
             pg.pagerLayout['pagination'] = pagerNumber;
 
-            // pager first/previous button
-            $('<li/>').
-                html($('<a/>').
-                    attr('title', DOMPurify.sanitize(title.first)).
-                    addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--first').
-                    append($('<i/>').addClass(icons.first)).
-                    on('click', pg.gotoMorePage).
-                    attr('data-page', 1)).
-                appendTo(pagerNumber);
-            $('<li/>').
-                html($('<a/>').
-                    attr('title', DOMPurify.sanitize(title.prev)).
-                    addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--prev').
-                    append($('<i/>').addClass(icons.prev)).
-                    on('click', pg.gotoMorePage)).
-                appendTo(pagerNumber);
+            // Whitelist allowed icon classes
+            const allowedIcons = ['fa-chevron-left', 'fa-angle-left', 'fa-ellipsis-h', 'custom-icon'];
+            const sanitizeIcon = icon => allowedIcons.includes(icon) ? icon : 'default-icon';
 
-            // more previous pages
-            $('<li/>').
-                append($('<a/>').
-                    attr('title', title.more).
-                    addClass(pfx + 'datatable__pager-link ' + pfx + 'datatable__pager-link--more-prev').
-                    html($('<i/>').addClass(icons.more)).
-                    on('click', pg.gotoMorePage)).
-                appendTo(pagerNumber);
+            // Sanitize titles
+            const safeTitleFirst = DOMPurify.sanitize(title.first);
+            const safeTitlePrev = DOMPurify.sanitize(title.prev);
+            const safeTitleMore = DOMPurify.sanitize(title.more);
+
+            // First page button
+            $('<li/>').append(
+                $('<a/>')
+                    .attr('title', safeTitleFirst)
+                    .addClass(`${pfx}datatable__pager-link ${pfx}datatable__pager-link--first`)
+                    .append($('<i/>').addClass(sanitizeIcon(icons.first)))
+                    .on('click', pg.gotoMorePage)
+                    .attr('data-page', 1)
+            ).appendTo(pagerNumber);
+
+            // Previous page button
+            $('<li/>').append(
+                $('<a/>')
+                    .attr('title', safeTitlePrev)
+                    .addClass(`${pfx}datatable__pager-link ${pfx}datatable__pager-link--prev`)
+                    .append($('<i/>').addClass(sanitizeIcon(icons.prev)))
+                    .on('click', pg.gotoMorePage)
+            ).appendTo(pagerNumber);
+
+            // More previous pages button
+            $('<li/>').append(
+                $('<a/>')
+                    .attr('title', safeTitleMore)
+                    .addClass(`${pfx}datatable__pager-link ${pfx}datatable__pager-link--more-prev`)
+                    .append($('<i/>').addClass(sanitizeIcon(icons.more)))
+                    .on('click', pg.gotoMorePage)
+            ).appendTo(pagerNumber);
+
 
             $('<li/>').append($('<input/>').attr('type', 'text').addClass(pfx + 'pager-input form-control').attr('title', title.input).on('keyup', function() {
               // on keyup update [data-page]
