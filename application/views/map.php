@@ -68,7 +68,7 @@ div#tawkchat-minified-wrapper {
 <script src="https://albarakatilaw.com/assets/vendors/dropzone/dist/dropzone.js" type="text/javascript"></script>
  
 <!--begin::Global Theme Bundle -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.7/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
 <script src="https://albarakatilaw.com/assets/demo/base/scripts.bundle.js" type="text/javascript"></script>
 
 
