@@ -3409,7 +3409,7 @@ $(document).ready(function() {
 
             options.columns[0]['subtable'] = true;
 
-            // toggle on open sub table
+            // Toggle on open sub table
             var toggleSubTable = function(e) {
                 e.preventDefault();
                 // get parent row of this subtable
