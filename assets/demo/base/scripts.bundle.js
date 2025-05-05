@@ -4441,20 +4441,36 @@ $(document).ready(function() {
       },
 
       /**
-       * Destroy datatable to original DOM state before datatable was
-       * initialized
-       * @returns {jQuery}
-       */
-      destroy: function() {
-        $(datatable).parent().find('.' + pfx + 'datatable__pager').remove();
-        var initialDatatable = $(datatable.initialDatatable).addClass(pfx + 'datatable--destroyed').show();
-        $(datatable).replaceWith(initialDatatable);
-        datatable = initialDatatable;
-        $(datatable).trigger(pfx + 'datatable--on-destroy');
-        Plugin.isInit = false;
-        initialDatatable = null;
-        return initialDatatable;
-      },
+         * Destroy datatable to original DOM state before datatable was
+         * initialized
+         * @returns {jQuery}
+         */
+        destroy: function() {
+            // Remove the pager from the parent
+            $(datatable).parent().find('.' + pfx + 'datatable__pager').remove();
+            
+            // Create the initial datatable element (using native DOM)
+            var initialDatatable = $(datatable.initialDatatable).addClass(pfx + 'datatable--destroyed').show()[0];
+            
+            // Replace the datatable element with the initialDatatable element safely
+            var parent = datatable.parentNode;
+            parent.replaceChild(initialDatatable, datatable);
+            
+            // Update the datatable variable to the new initial datatable
+            datatable = initialDatatable;
+            
+            // Trigger the on-destroy event
+            $(datatable).trigger(pfx + 'datatable--on-destroy');
+            
+            // Mark the plugin as not initialized
+            Plugin.isInit = false;
+            
+            // Clean up
+            initialDatatable = null;
+            
+            return $(initialDatatable); // Return as jQuery object for consistency
+        }
+  
 
       /**
        * Sort by column field
