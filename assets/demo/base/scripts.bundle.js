@@ -3396,124 +3396,126 @@ $(document).ready(function() {
       },
 
       /**
-       * Setup sub datatable
-       */
-      setupSubDatatable: function() {
-        var subTableCallback = Plugin.getOption('detail.content');
-        if (typeof subTableCallback !== 'function') return;
+         * Setup sub datatable
+         */
+        setupSubDatatable: function() {
+            var subTableCallback = Plugin.getOption('detail.content');
+            if (typeof subTableCallback !== 'function') return;
 
-        // subtable already exist
-        if ($(datatable.table).find('.' + pfx + 'datatable__subtable').length > 0) return;
+            // Subtable already exists
+            if ($(datatable.table).find('.' + pfx + 'datatable__subtable').length > 0) return;
 
-        $(datatable.wrap).addClass(pfx + 'datatable--subtable');
+            $(datatable.wrap).addClass(pfx + 'datatable--subtable');
 
-        options.columns[0]['subtable'] = true;
+            options.columns[0]['subtable'] = true;
 
-        // toggle on open sub table
-        var toggleSubTable = function(e) {
-          e.preventDefault();
-          // get parent row of this subtable
-          var parentRow = $(this).closest('.' + pfx + 'datatable__row');
+            // toggle on open sub table
+            var toggleSubTable = function(e) {
+                e.preventDefault();
+                // get parent row of this subtable
+                var parentRow = $(this).closest('.' + pfx + 'datatable__row');
 
-          // get subtable row for sub table
-          var subTableRow = $(parentRow).next('.' + pfx + 'datatable__row-subtable');
-          if ($(subTableRow).length === 0) {
-            // prepare DOM for sub table, each <tr> as parent and add <tr> as child table
-            subTableRow = $('<tr/>').
-                addClass(pfx + 'datatable__row-subtable ' + pfx + 'datatable__row-loading').
-                hide().
-                append($('<td/>').addClass(pfx + 'datatable__subtable').attr('colspan', Plugin.getTotalColumns()));
-            $(parentRow).after(subTableRow);
-            // add class to even row
-            if ($(parentRow).hasClass(pfx + 'datatable__row--even')) {
-              $(subTableRow).addClass(pfx + 'datatable__row-subtable--even');
-            }
-          }
+                // get subtable row for sub table
+                var subTableRow = $(parentRow).next('.' + pfx + 'datatable__row-subtable');
+                if ($(subTableRow).length === 0) {
+                    // prepare DOM for sub table, each <tr> as parent and add <tr> as child table
+                    subTableRow = $('<tr/>')
+                        .addClass(pfx + 'datatable__row-subtable ' + pfx + 'datatable__row-loading')
+                        .hide()
+                        .append($('<td/>').addClass(pfx + 'datatable__subtable').attr('colspan', Plugin.getTotalColumns()));
+                    $(parentRow).after(subTableRow);
+                    // add class to even row
+                    if ($(parentRow).hasClass(pfx + 'datatable__row--even')) {
+                        $(subTableRow).addClass(pfx + 'datatable__row-subtable--even');
+                    }
+                }
 
-          $(subTableRow).toggle();
+                $(subTableRow).toggle();
 
-          var subTable = $(subTableRow).find('.' + pfx + 'datatable__subtable');
+                var subTable = $(subTableRow).find('.' + pfx + 'datatable__subtable');
 
-          // get id from first column of parent row
-          var primaryKey = $(this).closest('[data-field]:first-child').find('.' + pfx + 'datatable__toggle-subtable').data('value');
+                // get id from first column of parent row
+                var primaryKey = $(this).closest('[data-field]:first-child').find('.' + pfx + 'datatable__toggle-subtable').data('value');
 
-          var icon = $(this).find('i').removeAttr('class');
+                var icon = $(this).find('i').removeAttr('class');
 
-          // prevent duplicate datatable init
-          if ($(parentRow).hasClass(pfx + 'datatable__row--subtable-expanded')) {
-            $(icon).addClass(Plugin.getOption('layout.icons.rowDetail.collapse'));
-            // remove expand class from parent row
-            $(parentRow).removeClass(pfx + 'datatable__row--subtable-expanded');
-            // trigger event on collapse
-            $(datatable).trigger(pfx + 'datatable--on-collapse-subtable', [parentRow]);
-          } else {
-            // expand and run callback function
-            $(icon).addClass(Plugin.getOption('layout.icons.rowDetail.expand'));
-            // add expand class to parent row
-            $(parentRow).addClass(pfx + 'datatable__row--subtable-expanded');
-            // trigger event on expand
-            $(datatable).trigger(pfx + 'datatable--on-expand-subtable', [parentRow]);
-          }
+                // prevent duplicate datatable init
+                if ($(parentRow).hasClass(pfx + 'datatable__row--subtable-expanded')) {
+                    $(icon).addClass(Plugin.getOption('layout.icons.rowDetail.collapse'));
+                    // remove expand class from parent row
+                    $(parentRow).removeClass(pfx + 'datatable__row--subtable-expanded');
+                    // trigger event on collapse
+                    $(datatable).trigger(pfx + 'datatable--on-collapse-subtable', [parentRow]);
+                } else {
+                    // expand and run callback function
+                    $(icon).addClass(Plugin.getOption('layout.icons.rowDetail.expand'));
+                    // add expand class to parent row
+                    $(parentRow).addClass(pfx + 'datatable__row--subtable-expanded');
+                    // trigger event on expand
+                    $(datatable).trigger(pfx + 'datatable--on-expand-subtable', [parentRow]);
+                }
 
-          // prevent duplicate datatable init
-          if ($(subTable).find('.' + pfx + 'datatable').length === 0) {
-            // get data by primary id
-            $.map(datatable.dataSet, function(n, i) {
-              // primary id must be at the first column, otherwise e.data will be undefined
-              if (primaryKey === n[options.columns[0].field]) {
-                e.data = n;
-                return true;
-              }
-              return false;
+                // prevent duplicate datatable init
+                if ($(subTable).find('.' + pfx + 'datatable').length === 0) {
+                    // get data by primary id
+                    $.map(datatable.dataSet, function(n, i) {
+                        // primary id must be at the first column, otherwise e.data will be undefined
+                        if (primaryKey === n[options.columns[0].field]) {
+                            e.data = n;
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    // deprecated in v5.0.6
+                    e.detailCell = subTable;
+
+                    e.parentRow = parentRow;
+                    e.subTable = subTable;
+
+                    // run callback with event
+                    subTableCallback(e);
+
+                    $(subTable).children('.' + pfx + 'datatable').on(pfx + 'datatable--on-init', function(e) {
+                        $(subTableRow).removeClass(pfx + 'datatable__row-loading');
+                    });
+                    if (Plugin.getOption('data.type') === 'local') {
+                        $(subTableRow).removeClass(pfx + 'datatable__row-loading');
+                    }
+                }
+            };
+
+            var columns = options.columns;
+            $(datatable.tableBody).find('.' + pfx + 'datatable__row').each(function(tri, tr) {
+                $(tr).find('.' + pfx + 'datatable__cell').each(function(tdi, td) {
+                    // get column settings by field
+                    var column = $.grep(columns, function(n, i) {
+                        return $(td).data('field') === n.field;
+                    })[0];
+                    if (typeof column !== 'undefined') {
+                        var value = $(td).text();
+                        // enable column subtable toggle
+                        if (typeof column.subtable !== 'undefined' && column.subtable) {
+                            // check if subtable toggle exist
+                            if ($(td).find('.' + pfx + 'datatable__toggle-subtable').length > 0) return;
+                            // append subtable toggle
+                            $(td)
+                                .html($('<a/>')
+                                    .addClass(pfx + 'datatable__toggle-subtable')
+                                    .attr('href', '#')
+                                    .attr('data-value', DOMPurify.sanitize(value)) // Sanitize the dynamic value
+                                    .attr('title', DOMPurify.sanitize(Plugin.getOption('detail.title'))) // Sanitize title attribute
+                                    .on('click', toggleSubTable)
+                                    .append($('<i/>').css('width', $(td).data('width')).addClass(Plugin.getOption('layout.icons.rowDetail.collapse')))
+                                );
+                        }
+                    }
+                });
             });
 
-            // deprecated in v5.0.6
-            e.detailCell = subTable;
+            // $(datatable.tableHead).find('.'+pfx+'-datatable__row').first()
+        },
 
-            e.parentRow = parentRow;
-            e.subTable = subTable;
-
-            // run callback with event
-            subTableCallback(e);
-
-            $(subTable).children('.' + pfx + 'datatable').on(pfx + 'datatable--on-init', function(e) {
-              $(subTableRow).removeClass(pfx + 'datatable__row-loading');
-            });
-            if (Plugin.getOption('data.type') === 'local') {
-              $(subTableRow).removeClass(pfx + 'datatable__row-loading');
-            }
-          }
-        };
-
-        var columns = options.columns;
-        $(datatable.tableBody).find('.' + pfx + 'datatable__row').each(function(tri, tr) {
-          $(tr).find('.' + pfx + 'datatable__cell').each(function(tdi, td) {
-            // get column settings by field
-            var column = $.grep(columns, function(n, i) {
-              return $(td).data('field') === n.field;
-            })[0];
-            if (typeof column !== 'undefined') {
-              var value = $(td).text();
-              // enable column subtable toggle
-              if (typeof column.subtable !== 'undefined' && column.subtable) {
-                // check if subtable toggle exist
-                if ($(td).find('.' + pfx + 'datatable__toggle-subtable').length > 0) return;
-                // append subtable toggle
-                $(td).
-                    html($('<a/>').
-                        addClass(pfx + 'datatable__toggle-subtable').
-                        attr('href', '#').
-                        attr('data-value', value).
-                        attr('title', Plugin.getOption('detail.title')).
-                        on('click', toggleSubTable).
-                        append($('<i/>').css('width', $(td).data('width')).addClass(Plugin.getOption('layout.icons.rowDetail.collapse'))));
-              }
-            }
-          });
-        });
-
-        // $(datatable.tableHead).find('.'+pfx+'-datatable__row').first()
-      },
 
       /**
        * Datasource mapping callback
