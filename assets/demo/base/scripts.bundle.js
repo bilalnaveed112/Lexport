@@ -3498,13 +3498,18 @@ $(document).ready(function() {
                         if (typeof column.subtable !== 'undefined' && column.subtable) {
                             // check if subtable toggle exist
                             if ($(td).find('.' + pfx + 'datatable__toggle-subtable').length > 0) return;
+
+                            // Sanitize the content to be inserted into the DOM
+                            var sanitizedValue = DOMPurify.sanitize(value); // Sanitize the dynamic value
+                            var sanitizedTitle = DOMPurify.sanitize(Plugin.getOption('detail.title')); // Sanitize the title attribute
+
                             // append subtable toggle
                             $(td)
                                 .html($('<a/>')
                                     .addClass(pfx + 'datatable__toggle-subtable')
                                     .attr('href', '#')
-                                    .attr('data-value', DOMPurify.sanitize(value)) // Sanitize the dynamic value
-                                    .attr('title', DOMPurify.sanitize(Plugin.getOption('detail.title'))) // Sanitize title attribute
+                                    .attr('data-value', sanitizedValue) // Sanitize data-value
+                                    .attr('title', sanitizedTitle) // Sanitize title
                                     .on('click', toggleSubTable)
                                     .append($('<i/>').css('width', $(td).data('width')).addClass(Plugin.getOption('layout.icons.rowDetail.collapse')))
                                 );
