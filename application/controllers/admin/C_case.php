@@ -396,7 +396,7 @@ $img = $this->db->delete('document', ['id' => $case_number, 'name' => $name]);
 if ($img) {
 	unlink("uploads/case_file/" . $name);
 }
-$send=$_SERVER['HTTP_REFERER'];
+$send=parse_url($_SERVER['HTTP_REFERER']);
 $json_data['case_id']= $case_number;
 insertActionLog($json_data,0,"e-service","assign");
 return redirect($send);
